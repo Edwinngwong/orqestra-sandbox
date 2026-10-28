@@ -13,3 +13,5 @@ The HTTP service validates and admits jobs; it must not execute untrusted code i
 - signed result manifest binding the run ID, commit, commands, image, exit codes, and artifact hashes.
 
 Provider-specific implementations belong behind a worker interface and require adversarial isolation tests before use with third-party repositories.
+
+`LocalDockerExecutor` is a development provider only. It requires an image pinned by digest and applies network, privilege, process, memory, CPU, filesystem, and timeout constraints. Because access to a Docker daemon is itself privileged, production deployments must place the executor on a dedicated worker host or replace it with an ephemeral managed runtime.
