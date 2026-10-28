@@ -11,7 +11,9 @@ export function createSandboxServer(options: { token: string; workerToken: strin
   const jobs = new JobStore(options.signingSecret);
   return createServer(async (request, response) => {
     try {
-      if (!authorized(request, request.url?.endsWith("/complete") ? options.workerToken : options.token)) return json(response, 401);
+      const workerRoute = request.url === "/v1/jobs/next" || request.url?.endsWith("/complete");
+      if (!authorized(request, workerRoute ? options.workerToken : options.token)) return json(response, 401);
+      if (request.method === "GET" && request.url === "/v1/jobs/next") return json(response, 200, jobs.leaseAccepted() ?? null);
       if (request.method === "POST" && request.url === "/v1/runs") { const input = await readJson(request) as SandboxRequest; validateRequest(input); return json(response, 202, jobs.create(input)); }
       const match = request.url?.match(/^\/v1\/runs\/([^/]+)(?:\/(complete))?$/);
       if (!match) return json(response, 404);

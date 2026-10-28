@@ -9,6 +9,7 @@ export class JobStore {
   constructor(private readonly signingSecret: string) {}
   create(request: SandboxRequest) { const existing = this.jobs.get(request.runId); if (existing) return structuredClone(existing); const job: Job = { request: structuredClone(request), status: "accepted" }; this.jobs.set(request.runId, job); return structuredClone(job); }
   get(id: string) { const job = this.jobs.get(id); return job && structuredClone(job); }
+  leaseAccepted() { const job = [...this.jobs.values()].find(value => value.status === "accepted"); if (!job) return undefined; job.status = "running"; return structuredClone(job); }
   cancel(id: string) { const job = this.jobs.get(id); if (!job) return undefined; if (["passed", "failed"].includes(job.status)) throw new Error("Completed job cannot be cancelled"); job.status = "cancelled"; return structuredClone(job); }
   complete(id: string, result: { passed: boolean; summary: string; exitCode: number }) {
     const job = this.jobs.get(id); if (!job) return undefined; if (job.status === "cancelled") throw new Error("Cancelled job cannot complete");
