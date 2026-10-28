@@ -18,7 +18,7 @@ for (;;) {
   if (!job) { await new Promise(resolve => setTimeout(resolve, 1000)); continue; }
   let root: string | undefined;
   try {
-    const checkout = await checkoutArchive(job.request.repository, job.request.commit, process.env.GITHUB_TOKEN);
+    const checkout = await checkoutArchive(job.request.repository, job.request.commit, job.request.repositoryToken ?? process.env.GITHUB_TOKEN);
     root = checkout.root;
     const result = await executor.execute(job.request, checkout.workspace);
     await request(`/v1/runs/${encodeURIComponent(job.request.runId)}/complete`, { method: "POST", body: JSON.stringify(result) });

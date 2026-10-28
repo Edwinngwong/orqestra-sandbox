@@ -1,4 +1,4 @@
-export interface SandboxRequest { runId: string; repository: string; commit: string; command: string[]; timeoutSeconds: number }
+export interface SandboxRequest { runId: string; repository: string; commit: string; command: string[]; timeoutSeconds: number; repositoryToken?: string }
 
 const allowedCommands = new Set(["npm", "pnpm", "yarn", "go", "cargo", "pytest"]);
 
