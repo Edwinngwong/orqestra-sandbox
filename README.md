@@ -2,7 +2,17 @@
 
 Execution-plane boundary for untrusted Orqestra coding-agent workloads.
 
-This scaffold defines and validates the run request contract. It does **not** yet execute user code; production execution must use a fresh ephemeral VM or container per run with no host mounts, default-deny egress, CPU/memory/time limits, short-lived credentials, immutable base images, log redaction, and guaranteed teardown.
+Before contributing, read [`AGENTS.md`](AGENTS.md). It is the authoritative
+project-state and engineering guide, and every milestone commit must update it.
+
+The current local MVP validates the run request contract and executes the exact
+requested commit in a constrained, digest-pinned Docker container. It disables
+workload networking, runs as a non-root user with a read-only root filesystem,
+drops Linux capabilities, applies CPU/memory/PID/time limits, signs the terminal
+result, and guarantees temporary checkout cleanup. Production execution must
+replace the local Docker worker with a fresh cloud task or microVM per run and
+add default-deny egress controls, durable job storage, centralized redacted
+logs, artifact scanning and retention, provenance, and emergency kill controls.
 
 ## Run
 
@@ -15,7 +25,7 @@ npm run dev
 
 ## API
 
-`POST /v1/runs` accepts a run ID, repository, immutable commit SHA, allow-listed command, and bounded timeout. A later worker adapter will turn accepted requests into isolated jobs and return signed test artifacts.
+`POST /v1/runs` accepts a run ID, repository, immutable commit SHA, allow-listed command, bounded timeout, and optional run-scoped repository token. The worker leases accepted jobs, executes them in isolation, and returns a signed terminal result.
 
 Read [the isolation contract](docs/ISOLATION.md) before deploying a worker. Acceptance alone is never treated as evidence that work executed or passed; completed results are signed separately.
 
