@@ -12,7 +12,7 @@ Do not use, request, reproduce, translate, or derive from any employer-proprieta
 
 - Milestone: Authenticated local commercial MVP execution plane
 - Sandbox version: 0.2.0
-- Compatible platform version: 0.6.x
+- Compatible platform version: 0.7.x
 - Milestone status: complete and live-tested locally
 
 Current capabilities:
@@ -27,7 +27,7 @@ Current capabilities:
 - Network-disabled, non-root containers with read-only root filesystem, capability drop, no-new-privileges, PID, CPU, memory, and timeout limits.
 - HMAC-signed completion payloads verified by the platform.
 - Retry of transient API connection failures while authentication failures remain fatal.
-- Compatibility with platform-side Muse intake and tracker routing; the execution request/result contract is unchanged.
+- Compatibility with platform-side Muse intake, tracker routing, and signed WhatsApp proposals; the execution request/result contract is unchanged.
 
 Known gaps before production use:
 
