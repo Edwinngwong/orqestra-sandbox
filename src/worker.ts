@@ -10,12 +10,18 @@ if (!workerToken || !image) throw new Error("SANDBOX_WORKER_TOKEN and digest-pin
 const executor = new LocalDockerExecutor(image);
 
 async function request(path: string, init: RequestInit = {}) { return fetch(`${baseUrl}${path}`, { ...init, headers: { authorization: `Bearer ${workerToken}`, "content-type": "application/json", ...init.headers } }); }
+const pause = () => new Promise(resolve => setTimeout(resolve, 1000));
 
 for (;;) {
-  const response = await request("/v1/jobs/next");
-  if (!response.ok) throw new Error(`Worker lease failed (${response.status})`);
+  let response: Response;
+  try { response = await request("/v1/jobs/next"); }
+  catch { await pause(); continue; }
+  if (!response.ok) {
+    if (response.status === 401 || response.status === 403) throw new Error(`Worker authentication failed (${response.status})`);
+    await pause(); continue;
+  }
   const job = await response.json() as Job | null;
-  if (!job) { await new Promise(resolve => setTimeout(resolve, 1000)); continue; }
+  if (!job) { await pause(); continue; }
   let root: string | undefined;
   try {
     const checkout = await checkoutArchive(job.request.repository, job.request.commit, job.request.repositoryToken ?? process.env.GITHUB_TOKEN);
